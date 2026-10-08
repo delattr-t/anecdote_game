@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12172b">
+<title>Qu'aurais-tu fait ?</title>
+<meta name="description" content="Jeu d'anecdotes vécues : devinez ce que vos potes ont vraiment fait. Chacun vote sur son téléphone.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2312172b'/%3E%3Cpath d='M4 19 12 5l8 14Z' fill='%23e8743b'/%3E%3Cpath d='M10 19l2-5 2 5Z' fill='%23f9d56e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>html,body{margin:0;background:#12172b;color:#f4efe3;font-family:'Nunito Sans',system-ui,sans-serif}.boot{max-width:440px;margin:0 auto;padding:40px 16px;font-size:15px;opacity:.7}</style>
+</head>
+<body>
+<main id="app">
+  <div id="top"><p class="boot">Chargement du jeu…</p></div>
+  <div id="scene"></div>
+  <div id="bottom"></div>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="cam" class="cam" aria-hidden="true">
+  <div class="cam-box">
+    <div class="cam-frame"><video id="camv" playsinline autoplay muted></video></div>
+    <div class="row">
+      <button type="button" class="b2" data-act="cam-cancel">Annuler</button>
+      <button type="button" class="b1" data-act="cam-shoot">Prendre la photo</button>
+    </div>
+    <button type="button" class="linkb" data-act="cam-file">Choisir une photo à la place</button>
+  </div>
+</div>
+<input id="file" type="file" accept="image/*" capture="user" class="vh" tabindex="-1" aria-hidden="true">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function () {
+  var URL_ = 'https://emfdrkrrggmifgkhfwzf.supabase.co/rest/v1/app_assets?select=name,content';
+  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtZmRya3JyZ2dtaWZna2hmd3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjAyNjMsImV4cCI6MjEwNzAzNjI2M30.npNlj1jcNkjQ06D1cCaYPFkzZuuTUT3kmVuAd25QuTM';
+  function fail() { document.getElementById('top').innerHTML = '<p class="boot">Impossible de charger le jeu. Vérifie ta connexion puis recharge la page.</p>'; }
+  fetch(URL_, { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (rows) {
+      var m = {};
+      rows.forEach(function (x) { m[x.name] = x.content; });
+      if (!m['app.js'] || !m['style.css'] || !window.supabase) throw new Error('missing');
+      var st = document.createElement('style'); st.textContent = m['style.css']; document.head.appendChild(st);
+      var sc = document.createElement('script'); sc.textContent = m['app.js']; document.body.appendChild(sc);
+    })
+    .catch(fail);
+})();
+</script>
+</body>
+</html>
